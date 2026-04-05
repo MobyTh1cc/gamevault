@@ -62,42 +62,42 @@ export const MOCK_NEWS = [
     title: 'GTA VI Gets Official Fall 2026 Release Window',
     body: 'Rockstar Games confirmed Grand Theft Auto VI will release in Fall 2026 for PS5 and Xbox Series X|S, with a PC version to follow. A second trailer showcased the Vice City setting and dual protagonists.',
     source: 'Rockstar Games', date: '2026-04-12', tag: 'Release Date',
-    img: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=700&q=80',
+    img: 'https://www.rockstargames.com/VI/_next/image?url=%2FVI%2F_next%2Fstatic%2Fmedia%2FJason_Duval_01.6e287338.jpg&w=3840&q=75',
   },
   {
     id: 2,
     title: "FromSoftware's Next Project Teased as 'Completely New World'",
     body: 'Hidetaka Miyazaki hinted at a new IP in development at FromSoftware, described as a departure from the Soulsborne formula.',
     source: 'FromSoftware', date: '2026-04-08', tag: 'Announcement',
-    img: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=700&q=80',
+    img: 'https://cdn.dlcompare.com/others_jpg/upload/news/image/en-fromsoftware-s-next-big-move-0b9ba356-image-0b9ba33e.jpg.webp',
   },
   {
     id: 3,
     title: 'Valve Announces Steam Deck 2 with OLED Display',
     body: "Valve unveiled the Steam Deck 2 with an OLED display, AMD's latest mobile chip, and redesigned ergonomics. Pre-orders open next month at $599.",
     source: 'Valve', date: '2026-04-05', tag: 'Hardware',
-    img: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=700&q=80',
+    img: 'https://media.wired.com/photos/654c04b098d337ba5af8c644/1:1/w_1190,h_1190,c_limit/Steam-Deck-OLED-review-Featured-Gear.jpg',
   },
   {
     id: 4,
     title: 'The Witcher 4 — First Gameplay Details Emerge',
     body: 'CD Projekt Red confirmed Ciri as the primary playable character in The Witcher 4, built on Unreal Engine 5 with a living world system.',
     source: 'CD Projekt Red', date: '2026-04-01', tag: 'Development',
-    img: 'https://images.unsplash.com/photo-1495121605193-b116b5b9c5fe?w=700&q=80',
+    img: 'https://thewitcher.cdn.cdpr.app/media/wallpaper/1748/3840x2160/02_Silver_Demo_Wallpaper_3840x2160_EN.png',
   },
   {
     id: 5,
     title: 'Nintendo Direct: Four New Switch 2 Exclusives Revealed',
     body: "Nintendo's Direct showcased four exclusives: new Metroid, Pikmin sequel, and two Capcom/Bandai Namco titles.",
     source: 'Nintendo', date: '2026-03-28', tag: 'Announcement',
-    img: 'https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?w=700&q=80',
+    img: 'https://static0.polygonimages.com/wordpress/wp-content/uploads/chorus/uploads/chorus_asset/file/24417914/nintendo_direct_stock.jpg',
   },
   {
     id: 6,
     title: 'Bethesda Confirms Elder Scrolls VI Set in Hammerfell',
     body: "A confirmed leak places TES VI in Hammerfell, targeting a 2028 release on Xbox Series and PC.",
     source: 'Bethesda', date: '2026-03-22', tag: 'Leak Confirmed',
-    img: 'https://images.unsplash.com/photo-1559163499-413811fb2344?w=700&q=80',
+    img: 'https://www.pcgamesn.com/wp-content/sites/pcgamesn/2021/12/elder-scrolls-6-release-date-speculation.jpg',
   },
 ]
 
@@ -129,41 +129,7 @@ export const combinedScore = (metacritic, rawgRating, communityAvg, reviewCount 
 export const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'TBA'
 
-// ── Disposable / temp email domain blocklist ───────────────────────────────
-// Covers the most common temp mail services
-export const TEMP_EMAIL_DOMAINS = new Set([
-  'mailinator.com','guerrillamail.com','guerrillamail.net','guerrillamail.org',
-  'guerrillamail.biz','guerrillamail.de','guerrillamail.info','grr.la','sharklasers.com',
-  'guerrillamailblock.com','spam4.me','trashmail.com','trashmail.at','trashmail.io',
-  'trashmail.me','trashmail.net','trashmail.xyz','tempmail.com','temp-mail.org',
-  'temp-mail.io','dispostable.com','throwam.com','throwam.net','yopmail.com',
-  'yopmail.fr','cool.fr.nf','jetable.fr.nf','nospam.ze.tc','nomail.xl.cx',
-  'mega.zik.dj','speed.1s.fr','courriel.fr.nf','moncourrier.fr.nf',
-  'monemail.fr.nf','monmail.fr.nf','mailnesia.com','mailnull.com','spamgourmet.com',
-  'spamgourmet.net','spamgourmet.org','spamspot.com','spamthis.co.uk',
-  'fakeinbox.com','maildrop.cc','discard.email','mailnull.com','spamfree24.org',
-  'mailexpire.com','mail-temporaire.fr','wegwerfmail.de','wegwerfmail.net',
-  'wegwerfmail.org','owlpic.com','trbvm.com','klzlk.com','tmailinator.com',
-  'tempr.email','discard.email','spamherelots.com','spamhereplease.com',
-  'tempemail.net','throwam.com','10minutemail.com','10minutemail.net',
-  '10minutemail.org','10minemail.com','20minutemail.com','mohmal.com',
-  'getnada.com','tempail.com','filzmail.com','tempomail.fr','jetable.net',
-  'jetable.org','jetable.com','safetymail.info','objectmail.com',
-  'spamfree.eu','spamfree24.de','spamfree24.eu','spamfree24.info',
-  'spamfree24.net','spamfree24.com','spamgourmet.com','spamgourmet.net',
-  'spoofmail.de','dispostable.com','mailinater.com','spaml.de','spamoff.de',
-  'binkmail.com','bobmail.info','chammy.info','devnullmail.com',
-  'letthemeatspam.com','mailandftp.com','mailbolt.com','mailc.net',
-  'mailchop.com','maildrop.cc','maileater.com','mailexpire.com',
-  'mailfa.tk','mailforspam.com','mailfreeonline.com','mailguard.me',
-  'mailin8r.com','mailinator2.com','mailite.com','mailme.lv',
-  'mailme24.com','mailmetrash.com','mailmoat.com','mailnew.com',
-  'mailnull.com','mailsac.com','mailscrap.com','mailshell.com',
-  'mailsiphon.com','mailslapping.com','mailslite.com','mailsoul.com',
-  'mailtome.de','mailtothis.com','mailtrash.net','mailtv.net',
-  'mailzilla.com','mailzilla.org','mbx.cc','mega.zik.dj',
-  'meltmail.com','mierdamail.com','migumail.com','mintemail.com',
-])
+
 
 export const isTempEmail = (email) => {
   const allowedDomains = [

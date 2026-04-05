@@ -330,6 +330,7 @@ export default function ForYouPage({ library, subscriptions }) {
             </article>
           ))}
         </div>
+        
       </section>
     </div>
   )
