@@ -166,9 +166,9 @@ export default function Navbar({ libraryCount }) {
                     </div>
 
                     {[
-                      { icon: '◉', label: 'My Profile',  path: `/profile/${user.uid}` },
-                      { icon: '◻', label: 'My Library',  path: '/library' },
-                      { icon: '⚙', label: 'Settings',    path: '/settings' },
+                      { icon: '😎', label: 'My Profile',  path: `/profile/${user.uid}` },
+                      { icon: '📚', label: 'My Library',  path: '/library' },
+                      { icon: '⚙️', label: 'Settings',    path: '/settings' },
                     ].map(({ icon, label, path }) => (
                       <button key={path} onClick={() => go(path)}
                         style={{
@@ -198,7 +198,7 @@ export default function Navbar({ libraryCount }) {
                         onMouseEnter={(e) => e.currentTarget.style.background = 'var(--red-dim)'}
                         onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
                       >
-                        <span style={{ opacity: .8, fontSize: 12 }}>⏻</span> Sign Out
+                        <span style={{ opacity: .8, fontSize: 12 }}>🚪</span> Sign Out
                       </button>
                     </div>
                   </div>
@@ -283,10 +283,10 @@ export default function Navbar({ libraryCount }) {
                   <span style={{ fontWeight: 600 }}>{profile?.displayName || user.displayName}</span>
                 </button>
                 <button onClick={() => go('/settings')} style={{ padding: '10px 14px', borderRadius: 9, background: 'none', border: 'none', color: 'var(--text1)', fontSize: '.92rem', cursor: 'pointer', textAlign: 'left', fontFamily: 'var(--font-body)' }}>
-                  ⚙ Settings
+                  ⚙️ Settings
                 </button>
                 <button onClick={handleLogOut} style={{ padding: '10px 14px', borderRadius: 9, background: 'none', border: 'none', color: 'var(--red)', fontSize: '.92rem', cursor: 'pointer', textAlign: 'left', fontFamily: 'var(--font-body)' }}>
-                  ⏻ Sign Out
+                  🚪 Sign Out
                 </button>
               </div>
             ) : (

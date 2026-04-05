@@ -190,7 +190,7 @@ function SuggestForm({ onClose, user, profile, toast }) {
   // this DOM — the textarea keeps focus no matter what fires upstream.
  const formContent = (
   <div
-    onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
+    // onClick={(e) => { if (e.target === e.currentTarget) onClose() }} can bring it back but causes accidental closes when clicking inside the form, so removed for now
     style={{
       position: 'fixed', inset: 0, zIndex: 1000,
       background: 'rgba(7,8,13,.85)', backdropFilter: 'blur(8px)',

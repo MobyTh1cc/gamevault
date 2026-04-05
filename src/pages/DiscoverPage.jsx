@@ -52,21 +52,39 @@ export default function DiscoverPage({ library, onLibraryToggle }) {
   }, [search, filters])
 
   useEffect(() => {
-    setLoading(true); setGames([])
-    rawgFetch('/games', buildParams()).then((d) => {
-      let results = d.results || []
-      results = results.filter((g) => g.metacritic || g.rating > 0)
-      if (!showNSFW) results = results.filter((g) => g.esrb_rating?.slug !== 'adults-only')
-      if (filters.ordering === 'combined') {
-        results = results
-          .map((g) => ({ ...g, _cs: combinedScore(g.metacritic, g.rating, null, 0) || 0 }))
-          .sort((a, b) => b._cs - a._cs)
-      }
-      setGames(results)
-      setNextUrl(d.next || null)
-      setTotal(d.count || 0)
-    }).catch(console.error).finally(() => setLoading(false))
-  }, [buildParams])
+  setLoading(true); 
+  setGames([]);
+
+  rawgFetch('/games', buildParams()).then((d) => {
+    let results = d.results || [];
+
+    // 1. THE "STRICT AND" FIREWALL
+    // If the user selected genres, manually verify every game has ALL of them
+    if (filters.genres.length > 0) {
+      results = results.filter((game) => {
+        // Get the slugs of all genres attached to this specific game
+        const gameGenreIds = game.genres?.map((g) => g.id) || [];
+        // Only return true if EVERY selected filter ID is present in the game's IDs
+        return filters.genres.every((selectedId) => gameGenreIds.includes(selectedId));
+      });
+    }
+
+    // 2. Your existing filters (Quality & NSFW)
+    results = results.filter((g) => g.metacritic || g.rating > 0);
+    if (!showNSFW) results = results.filter((g) => g.esrb_rating?.slug !== 'adults-only');
+
+    // 3. Your existing Combined Score sorting
+    if (filters.ordering === 'combined') {
+      results = results
+        .map((g) => ({ ...g, _cs: combinedScore(g.metacritic, g.rating, null, 0) || 0 }))
+        .sort((a, b) => b._cs - a._cs);
+    }
+
+    setGames(results);
+    setNextUrl(d.next || null);
+    setTotal(d.count || 0);
+  }).catch(console.error).finally(() => setLoading(false));
+}, [buildParams, filters.genres, showNSFW]); // Added specific dependencies
 
 
   useEffect(() => {
@@ -113,6 +131,9 @@ export default function DiscoverPage({ library, onLibraryToggle }) {
 
   
   return (
+
+    console.log("buildparams " + buildParams),
+    
     <div style={{ display: 'flex' }}>
 
       {/* 1. The Backdrop (Overlay) */}
@@ -153,7 +174,7 @@ export default function DiscoverPage({ library, onLibraryToggle }) {
           >
             {/* hello man */}
             <span  style={{ fontSize: 13 }}>◫</span> 
-            Filterss
+            Filters
             {activeCount > 0 && (
               <span style={{ background: 'var(--grad)', color: '#fff', borderRadius: 999, minWidth: 17, height: 17, fontSize: '.6rem', fontWeight: 800, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px' }}>{activeCount}</span>
             )}
@@ -187,8 +208,8 @@ export default function DiscoverPage({ library, onLibraryToggle }) {
           <span style={{ fontSize: '.76rem', color: 'var(--text2)' }}>
             Sort: <strong style={{ color: 'var(--text0)' }}>{currentSortLabel}</strong>
           </span>
-          {!showNSFW && (
-            <span className="pill" style={{ fontSize: '.7rem', padding: '2px 9px' }}>🔞 NSFW off</span>
+          {showNSFW && (
+            <span className="pill" style={{ fontSize: '.7rem', padding: '2px 9px' }}>🔞 NSFW on</span>
           )}
           <span className="pill" style={{ fontSize: '.7rem', padding: '2px 9px' }}>📅 Released only</span>
         </div>

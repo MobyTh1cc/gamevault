@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { MetaBadge, Tag } from './ui'
 import { combinedScore, scoreColor } from '../lib/constants'
+import { useAuth } from '../lib/AuthContext'
 
 export default function GameCard({ game, library, onLibraryToggle }) {
   const navigate  = useNavigate()
@@ -13,6 +14,8 @@ export default function GameCard({ game, library, onLibraryToggle }) {
   const combined = combinedScore(game.metacritic, game.rating, null, 0)
   const score    = combined || (game.rating > 0 ? game.rating : null)
   const color    = score ? scoreColor(score) : null
+  const { user, profile } = useAuth()
+  
 
   return (
     <article
@@ -47,6 +50,7 @@ export default function GameCard({ game, library, onLibraryToggle }) {
             : <span />
           }
           {/* Library button */}
+          { user && (
           <button
             aria-label={inLib ? 'Remove from library' : 'Add to library'}
             onClick={(e) => { e.stopPropagation(); onLibraryToggle?.(game) }}
@@ -61,8 +65,8 @@ export default function GameCard({ game, library, onLibraryToggle }) {
               transition: 'all .18s',
               cursor: 'pointer',
             }}
-          >{inLib ? '✓' : '+'}</button>
-        </div>
+          >{inLib ? '✓' : '+'}</button>)}
+        </div> 
 
         {/* Combined score bottom-left */}
         {score && (
@@ -117,7 +121,7 @@ export default function GameCard({ game, library, onLibraryToggle }) {
         {/* Genres */}
         {game.genres?.length > 0 && (
           <div style={{ display: 'flex', gap: 4, overflow: 'hidden', flexWrap: 'nowrap', flexShrink: 0 }}>
-            {game.genres.slice(0, 2).map((g) => (
+            {game.genres.slice(0, 5).map((g) => (
               <Tag key={g.id} color="muted" small>{g.name}</Tag>
             ))}
           </div>

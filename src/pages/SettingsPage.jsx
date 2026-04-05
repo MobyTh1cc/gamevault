@@ -99,7 +99,7 @@ export default function SettingsPage() {
           <div>
             <p style={{ fontWeight: 700, color: 'var(--text0)', fontSize: '.9rem' }}>{user.email}</p>
             <p style={{ fontSize: '.76rem', color: 'var(--text2)', marginTop: 2 }}>
-              {user.providerData?.[0]?.providerId === 'google.com' ? '◉ Google account' : '◎ Email account'}
+              {user.providerData?.[0]?.providerId === 'google.com' ? '📧 Google account' : '✉️ Email account'}
             </p>
           </div>
         </div>
