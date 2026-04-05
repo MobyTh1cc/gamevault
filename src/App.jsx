@@ -16,6 +16,10 @@ import SettingsPage       from './pages/SettingsPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import NotFoundPage       from './pages/NotFoundPage'
 import { FilterProvider } from './lib/FilterContext'
+import FriendsPage     from './pages/FriendsPage'
+import ActivityPage    from './pages/ActivityPage'
+import ForumPage       from './pages/ForumPage'
+import ForumPostPage   from './pages/ForumPostPage'
 
 export default function App() {
   const { user }  = useAuth()
@@ -76,6 +80,10 @@ export default function App() {
           <Route path="/settings"          element={<SettingsPage />} />
           <Route path="/forgot-password"   element={<ForgotPasswordPage />} />
           <Route path="*"                  element={<NotFoundPage />} />
+          <Route path="/friends"        element={<FriendsPage />} />
+          <Route path="/activity"       element={<ActivityPage />} />
+          <Route path="/forum"          element={<ForumPage />} />
+          <Route path="/forum/:postId"  element={<ForumPostPage />} />
         </Routes>
       </FilterProvider>
     </>

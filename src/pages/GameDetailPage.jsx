@@ -55,6 +55,7 @@ function ReviewForm({ gameId, gameName, existingReview, onDone }) {
   const tooLong   = body.length > REVIEW_MAX
 
   const submit = async (e) => {
+    
     e.preventDefault()
     if (!rating) return toast('Please choose a star rating', 'warning')
     if (tooShort) return toast('Review must be at least 10 characters', 'warning')
@@ -85,6 +86,12 @@ function ReviewForm({ gameId, gameName, existingReview, onDone }) {
     } finally {
       setSaving(false)
     }
+    await addDoc(collection(db, 'activity'), {
+    uid: user.uid, displayName: user.displayName, photoURL: user.photoURL,
+    type: 'review', gameId: String(gameId), gameName,
+    gameImage: null, detail: body.trim(), rating,
+    createdAt: serverTimestamp(),
+  })
   }
 
   return (

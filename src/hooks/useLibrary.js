@@ -1,7 +1,7 @@
 // src/hooks/useLibrary.js
 import { useState, useEffect, useCallback } from 'react'
 import {
-  collection, doc, setDoc, deleteDoc, onSnapshot, serverTimestamp
+  collection, doc, setDoc, deleteDoc, onSnapshot, serverTimestamp, addDoc
 } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { useAuth } from '../lib/AuthContext'
@@ -51,6 +51,8 @@ export function useLibrary() {
       addedAt: Date.now(),
     }
 
+    
+
     if (user) {
       await setDoc(doc(db, 'users', user.uid, 'library', String(game.id)), {
         ...entry, addedAt: serverTimestamp(),
@@ -60,6 +62,14 @@ export function useLibrary() {
       localStorage.setItem('gv_library', JSON.stringify(next))
       setLibrary(next)
     }
+
+    await addDoc(collection(db, 'activity'), {
+      uid: user.uid, displayName: user.displayName, photoURL: user.photoURL,
+      type: 'library', gameId: game.id, gameName: game.name,
+      gameImage: game.background_image || null,
+      detail: null, rating: null, createdAt: serverTimestamp(),
+    })
+    
   }, [user, library])
 
   const removeFromLibrary = useCallback(async (gameId) => {

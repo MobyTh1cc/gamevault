@@ -170,6 +170,12 @@ function SuggestForm({ onClose, user, profile, toast }) {
     } finally {
       setSaving(false)
     }
+      await addDoc(collection(db, 'activity'), {
+        uid: user.uid, displayName: user.displayName, photoURL: user.photoURL,
+        type: 'suggestion', gameId: selectedGame.id, gameName: selectedGame.name,
+        gameImage: selectedGame.background_image || null,
+        detail: description.trim(), rating: null, createdAt: serverTimestamp(),
+      })
   }
 
   const Field = ({ label, required, children }) => (
