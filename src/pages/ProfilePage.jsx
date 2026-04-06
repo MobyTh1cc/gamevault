@@ -62,30 +62,39 @@ export default function ProfilePage() {
 
 
   const handleBanUser = async () => {
-    if (!window.confirm(`Ban ${profile.displayName} and DELETE all their content?`)) return;
+    if (!window.confirm(`BAN and PERMANENTLY DELETE all user content?`)) return;
     
     try {
-      const { updateDoc, doc, collection, query, where, getDocs, deleteDoc } = await import('firebase/firestore');
+      const { updateDoc, doc, collection, query, where, getDocs, deleteDoc, collectionGroup } = await import('firebase/firestore');
 
-      // 1. Ban the User
+      // 1. Set the Ban Flag
       await updateDoc(doc(db, 'users', uid), { banned: true });
 
-      // 2. Wipe Reviews
-      const revs = await getDocs(query(collection(db, 'reviews'), where('uid', '==', uid)));
-      revs.forEach(d => deleteDoc(d.ref));
+      // 2. Define all target collections
+      const targets = [
+        query(collection(db, 'reviews'), where('uid', '==', uid)),
+        query(collection(db, 'suggestions'), where('uid', '==', uid)),
+        query(collection(db, 'forumPosts'), where('uid', '==', uid)),
+        query(collection(db, 'recommendations'), where('uid', '==', uid)), // Custom recs
+        query(collectionGroup(db, 'replies'), where('uid', '==', uid)) // Nested forum answers
+      ];
 
-      // 3. Wipe Suggestions
-      const sugs = await getDocs(query(collection(db, 'suggestions'), where('uid', '==', uid)));
-      sugs.forEach(d => deleteDoc(d.ref));
+      // 3. Loop and Delete
+      for (const q of targets) {
+        const snap = await getDocs(q);
+        const deletePromises = snap.docs.map(d => deleteDoc(d.ref));
+        await Promise.all(deletePromises);
+      }
 
-      // 4. Update UI
+      // 4. Update UI State
       setProfile(prev => ({ ...prev, banned: true }));
-      setReviews([]); // Clear local lists so they vanish from the page
+      setReviews([]);
       setSuggestions([]);
       
-      alert('User banned and content purged.');
+      alert('User banned. All reviews, suggestions, posts, and recommendations purged.');
     } catch (err) {
-      console.error("Purge failed", err);
+      console.error("Deep purge failed:", err);
+      alert('Purge failed. Check the console for index errors.');
     }
   };
 
