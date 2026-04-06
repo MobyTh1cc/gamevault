@@ -19,7 +19,6 @@ export default function FilterSidebar({ filters, setFilters, onClear, open, onCl
     </div>
   )
 
-  console.log(open)
   return (
     <>
       {/* Mobile backdrop */}

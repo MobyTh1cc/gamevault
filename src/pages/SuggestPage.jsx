@@ -10,7 +10,7 @@ import { db } from '../lib/firebase'
 import { useAuth } from '../lib/AuthContext'
 import { useToast } from '../lib/ToastContext'
 import { Tag, Spinner, Empty, Modal } from '../components/ui'
-import { fmtDate, GENRES, PLATFORMS, TAGS_SPECIAL } from '../lib/constants'
+import { fmtDate, GENRES, PLATFORMS, TAGS_SPECIAL} from '../lib/constants'
 import { searchGames } from '../lib/api'
 
 /* ─── Game picker ──────────────────────────────────────────────────────────
@@ -129,14 +129,16 @@ function SuggestForm({ onClose, user, profile, toast }) {
   console.log("Rendering SuggestForm")
   const [selectedGame, setSelectedGame]         = useState(null)
   const [description, setDescription]           = useState('')
-  const [selectedGenre, setSelectedGenre]       = useState('')
-  const [selectedPlatform, setSelectedPlatform] = useState('')
+  const [selectedGenres, setSelectedGenres]     = useState([])
+  const [selectedPlatforms, setSelectedPlatforms] = useState([]) 
   const [selectedTags, setSelectedTags]         = useState([])
   const [saving, setSaving]                     = useState(false)
 
-  const toggleTag      = useCallback((name) => {
-    setSelectedTags((p) => p.includes(name) ? p.filter((x) => x !== name) : [...p, name])
-  }, [])
+  const toggleTag = useCallback((setter, name) => {
+  setter((prev) => 
+    prev.includes(name) ? prev.filter((x) => x !== name) : [...prev, name]
+  )
+}, [])
 
   const handleGameChange = useCallback((g) => setSelectedGame(g), [])
 
@@ -153,8 +155,8 @@ function SuggestForm({ onClose, user, profile, toast }) {
         gameReleased: selectedGame.released || null,
         gameRating:   selectedGame.rating || 0,
         description:  description.trim(),
-        genre:        selectedGenre,
-        platform:     selectedPlatform,
+        genre: selectedGenres, 
+        platform: selectedPlatforms,
         tags:         selectedTags,
         uid:          user.uid,
         displayName:  profile?.displayName || user.displayName || 'Gamer',
@@ -266,19 +268,51 @@ function SuggestForm({ onClose, user, profile, toast }) {
             </button>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <Field label="Genre">
-              <select className="input" value={selectedGenre} onChange={(e) => setSelectedGenre(e.target.value)}>
-                <option value="">Any genre</option>
-                {GENRES.map((g) => <option key={g.id} value={g.name}>{g.icon} {g.name}</option>)}
-              </select>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>            
+            <Field label="Genres">
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {GENRES.map((g) => {
+                  const active = selectedGenres.includes(g.name)
+                  return (
+                    <button key={g.id} type="button" className={`pill ${active ? 'active' : ''}`}
+                      onClick={() => toggleTag(setSelectedGenres, g.name)}>
+                      {g.icon} {g.name}
+                    </button>
+                  )
+                })}
+              </div>
             </Field>
-            <Field label="Platform">
-              <select className="input" value={selectedPlatform} onChange={(e) => setSelectedPlatform(e.target.value)}>
-                <option value="">Any platform</option>
-                {PLATFORMS.map((p) => <option key={p.id} value={p.name}>{p.icon} {p.name}</option>)}
-              </select>
+
+            <Field label="Tags">
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {TAGS_SPECIAL.map((t) => {
+                  const active = selectedTags.includes(t.name)
+                  return (
+                    <button key={t.id} type="button" className={`pill ${active ? 'active-violet' : ''}`}
+                      onClick={() => toggleTag(setSelectedTags, t.name)}>
+                      {t.icon} {t.name}
+                    </button>
+                  )
+                })}
+              </div>
             </Field>
+
+            <Field label="Platforms">
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {PLATFORMS.map((p) => {
+                  const active = selectedPlatforms.includes(p.name)
+                  return (
+                    <button key={p.id} type="button" className={`pill ${active ? 'active-violet' : ''}`}
+                      onClick={() => toggleTag(setSelectedPlatforms, p.name)}>
+                      {p.icon} {p.name}
+                    </button>
+                  )
+                })}
+              </div>
+            </Field>
+
+            
+
           </div>
 
           <Field label="Why play it? *" required>
@@ -364,6 +398,8 @@ function SuggestionCard({ suggestion, currentUid }) {
         background: 'var(--bg2)', border: '1px solid var(--border)',
         borderRadius: 'var(--radius)', overflow: 'hidden',
         display: 'flex', transition: 'border-color .2s',
+        
+        
       }}
       onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--border2)'}
       onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
@@ -394,8 +430,28 @@ function SuggestionCard({ suggestion, currentUid }) {
             )}
           </div>
           <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', flexShrink: 0 }}>
-            {suggestion.genre    && <Tag color="accent" small>{suggestion.genre}</Tag>}
-            {suggestion.platform && <Tag color="blue"   small>{suggestion.platform}</Tag>}
+            {/* GENRES: Cyan Glow */}
+            {Array.isArray(suggestion.genre) ? (
+              suggestion.genre.map((g, i) => (
+                <span key={i} className="pill active" style={{ fontSize: '.7rem', padding: '2px 9px' }}>{g}</span>
+              ))
+            ) : (
+              suggestion.genre && <span className="pill active" style={{ fontSize: '.7rem', padding: '2px 9px' }}>{suggestion.genre}</span>
+            )}
+            
+            {/* PLATFORMS: Violet Glow */}
+            {Array.isArray(suggestion.platform) ? (
+              suggestion.platform.map((p, i) => (
+                <span key={i} className="pill active-violet" style={{ fontSize: '.7rem', padding: '2px 9px' }}>{p}</span>
+              ))
+            ) : (
+              suggestion.platform && <span className="pill active-violet" style={{ fontSize: '.7rem', padding: '2px 9px' }}>{suggestion.platform}</span>
+            )}
+
+            {/* TAGS: Cyan Glow */}
+            {Array.isArray(suggestion.tags) && suggestion.tags.map((t, i) => (
+              <span key={i} className="pill active" style={{ fontSize: '.7rem', padding: '2px 9px' }}>{t}</span>
+            ))}
           </div>
         </div>
 
@@ -418,7 +474,7 @@ function SuggestionCard({ suggestion, currentUid }) {
           </span>
 
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <button onClick={handleVote} disabled={voting}
+            <button onClick={handleVote} disabled={voting} className='btn'
               style={{
                 background: voted ? 'rgba(0,212,255,.12)' : 'var(--bg3)',
                 border: `1px solid ${voted ? 'var(--cyan)' : 'var(--border)'}`,
@@ -500,10 +556,22 @@ export default function SuggestPage() {
   }, [showForm])
 
   const filtered = suggestions
-    .filter((s) => !search || s.gameName?.toLowerCase().includes(search.toLowerCase()) || s.description?.toLowerCase().includes(search.toLowerCase()))
-    .filter((s) => !filterGenre    || s.genre    === filterGenre)
-    .filter((s) => !filterPlatform || s.platform === filterPlatform)
-    .filter((s) => !filterTag      || s.tags?.includes(filterTag))
+    .filter((s) => !search || 
+      s.gameName?.toLowerCase().includes(search.toLowerCase()) || 
+      s.description?.toLowerCase().includes(search.toLowerCase())
+    )
+    // Fix Genre: Check if the array includes the filter string
+    .filter((s) => !filterGenre || (
+      Array.isArray(s.genre) ? s.genre.includes(filterGenre) : s.genre === filterGenre
+    ))
+    // Fix Platform: Check if the array includes the filter string
+    .filter((s) => !filterPlatform || (
+      Array.isArray(s.platform) ? s.platform.includes(filterPlatform) : s.platform === filterPlatform
+    ))
+    // Tags (Already uses includes, but added safety for single strings)
+    .filter((s) => !filterTag || (
+      Array.isArray(s.tags) ? s.tags.includes(filterTag) : s.tags === filterTag
+    ))
     .sort((a, b) => sortBy === 'votes'
       ? (b.votes || 0) - (a.votes || 0)
       : (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)
@@ -554,7 +622,7 @@ export default function SuggestPage() {
         <select className="input" style={{ flex: '1 1 120px', minWidth: 110, padding: '8px 10px', fontSize: '.83rem' }}
           value={filterGenre} onChange={(e) => setFilterGenre(e.target.value)}>
           <option value="">All Genres</option>
-          {GENRES.map((g) => <option key={g.id} value={g.name}>{g.name}</option>)}
+          {GENRES.map((g) => <option  key={g.id} value={g.name}>{g.name}</option>)}
         </select>
 
         <select className="input" style={{ flex: '1 1 120px', minWidth: 110, padding: '8px 10px', fontSize: '.83rem' }}

@@ -18,6 +18,7 @@ export default function GameCard({ game, library, onLibraryToggle }) {
   
 
   return (
+    console.log(game.name + " inLib: " + inLib + " score: " + score),
     <article
       className="game-card"
       onMouseEnter={() => setHovered(true)}

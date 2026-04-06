@@ -132,7 +132,6 @@ export default function DiscoverPage({ library, onLibraryToggle }) {
   
   return (
 
-    console.log("buildparams " + buildParams),
     
     <div style={{ display: 'flex' }}>
 
@@ -264,6 +263,8 @@ export default function DiscoverPage({ library, onLibraryToggle }) {
             <div className="games-grid">
               {games.map((game, i) => (
                 <div key={game.id} className="anim-fade-up" style={{ animationDelay: `${Math.min(i % 12, 8) * 35}ms` }}>
+                  
+                  
                   <GameCard game={game} library={library} onLibraryToggle={onLibraryToggle} />
                 </div>
               ))}

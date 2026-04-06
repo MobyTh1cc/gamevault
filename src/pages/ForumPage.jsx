@@ -221,19 +221,53 @@ function PostCard({ post, navigate }) {
 
   return (
     <div onClick={() => navigate(`/forum/${post.id}`)}
-      style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: '16px 18px', cursor: 'pointer', display: 'flex', gap: 16, transition: 'border-color .18s' }}
+      style={{ 
+        position: 'relative', // CRITICAL: For the background image to stay inside
+        overflow: 'hidden',   // CRITICAL: Crops the blur at the edges
+        background: 'var(--bg2)', 
+        border: '1px solid var(--border)', 
+        borderRadius: 'var(--radius)', 
+        padding: '16px 18px', 
+        cursor: 'pointer', 
+        display: 'flex', 
+        gap: 16, 
+        transition: 'border-color .18s' 
+      }}
       onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--border3)'}
       onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
     >
-      {/* Vote column */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, flexShrink: 0 }} onClick={e => e.stopPropagation()}>
+      {/* 1. Blurry Background Image Section */}
+      {post.gameImage && (
+        <img 
+          src={post.gameImage} 
+          alt="" 
+          style={{
+            position: 'absolute',
+            right: 0,
+            top: 0,
+            height: '100%',
+            width: '60%',      // Covers slightly more than half
+            objectFit: 'cover',
+            zIndex: 0,         // Behind the text
+            opacity: 0.25,     // Soft subtle look
+            filter: 'blur(2px)', // The blur effect
+            pointerEvents: 'none',
+            /* Fades the image from right (solid) to left (transparent) */
+            maskImage: 'linear-gradient(to left, black 20%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to left, black 20%, transparent 100%)'
+          }} 
+        />
+      )}
+
+      {/* 2. Vote column (Z-Index ensures it stays above background) */}
+      <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, flexShrink: 0 }} onClick={e => e.stopPropagation()}>
         <button onClick={handleUpvote}
           style={{ background: upvoted ? 'rgba(0,212,255,.12)' : 'none', border: `1px solid ${upvoted ? 'var(--cyan)' : 'var(--border2)'}`, color: upvoted ? 'var(--cyan)' : 'var(--text2)', borderRadius: 7, width: 36, height: 30, cursor: 'pointer', fontSize: 13, fontWeight: 700, transition: 'all .15s', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>▲</button>
         <span style={{ fontSize: '.82rem', fontWeight: 800, color: upvoted ? 'var(--cyan)' : 'var(--text1)', lineHeight: 1 }}>{votes}</span>
       </div>
 
-      {/* Main content */}
-      <div style={{ flex: 1, minWidth: 0 }}>
+      {/* 3. Main content (Z-Index ensures it stays above background) */}
+      <div style={{ position: 'relative', zIndex: 1, flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 7, flexWrap: 'wrap' }}>
           <span style={{ fontSize: '.72rem', fontWeight: 700, color: cat.color, background: cat.color + '18', border: `1px solid ${cat.color}40`, borderRadius: 999, padding: '2px 9px' }}>{cat.icon} {cat.label}</span>
           {post.gameName && (
@@ -244,6 +278,7 @@ function PostCard({ post, navigate }) {
         <h3 style={{ fontWeight: 700, fontSize: '.96rem', color: 'var(--text0)', lineHeight: 1.35, marginBottom: 6, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{post.title}</h3>
         <p style={{ fontSize: '.82rem', color: 'var(--text2)', lineHeight: 1.6, marginBottom: 10, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{post.body}</p>
 
+        {/* ... keep the rest of your Submitter info the same ... */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             {post.photoURL
@@ -258,13 +293,8 @@ function PostCard({ post, navigate }) {
           <span style={{ fontSize: '.73rem', color: 'var(--text2)', marginLeft: 'auto' }}>💬 {post.replyCount || 0} replies</span>
         </div>
       </div>
-
-      {/* Game cover */}
-      {post.gameImage && (
-        <img src={post.gameImage} alt={post.gameName} style={{ width: 72, height: 50, borderRadius: 8, objectFit: 'cover', flexShrink: 0, alignSelf: 'center', opacity: .85 }} />
-      )}
     </div>
-  )
+)
 }
 
 /* ── Main forum page ── */
