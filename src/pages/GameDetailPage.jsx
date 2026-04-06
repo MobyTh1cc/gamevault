@@ -147,6 +147,18 @@ function ReviewCard({ review, currentUid, onEdit }) {
   const toast = useToast()
   const [confirm, setConfirm] = useState(false)
   const isOwner = currentUid === review.uid
+  const { user } = useAuth()
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    // Fetch the user's profile doc to check the flag
+    getDoc(doc(db, 'users', user.uid)).then(snap => {
+      if (snap.exists() && snap.data().isAdmin === true) {
+        setIsAdmin(true);
+      }
+    });
+  }, [user]);
 
   const handleDelete = async () => {
     const docId = `${review.uid}_${review.gameId}`
@@ -205,7 +217,7 @@ function ReviewCard({ review, currentUid, onEdit }) {
       }}>{review.body}</p>
 
       {/* Owner actions */}
-      {isOwner && (
+      {(isOwner || isAdmin) && (
         <div style={{ display: 'flex', gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
           <button className="btn btn-ghost" style={{ padding: '5px 12px', fontSize: '.76rem' }} onClick={onEdit}>Edit</button>
           {confirm
@@ -388,6 +400,9 @@ function RecCard({ rec, currentUid, onEdit }) {
   const [score, setScore]   = useState(rec.score || 0)
   const [voting, setVoting] = useState(false)
   const [confirm, setConfirm] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false);
+
+
   const isOwner = currentUid === rec.uid
 
   // Load user's existing vote
@@ -517,7 +532,7 @@ function RecCard({ rec, currentUid, onEdit }) {
         <button onClick={() => handleVote('down')} disabled={voting}
           style={{ background: vote === 'down' ? 'rgba(255,77,109,.15)' : 'none', border: `1px solid ${vote === 'down' ? 'var(--red)' : 'var(--border2)'}`, color: vote === 'down' ? 'var(--red)' : 'var(--text2)', borderRadius: 7, width: 36, height: 32, cursor: 'pointer', fontSize: 14, fontWeight: 700, transition: 'all .15s', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>▼</button>
 
-        {isOwner && (
+        {(isOwner || isAdmin) && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 6 }}>
             <button className="btn btn-ghost" style={{ padding: '3px 8px', fontSize: '.7rem' }} onClick={() => onEdit(rec)}>Edit</button>
             {confirm

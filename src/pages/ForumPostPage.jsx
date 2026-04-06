@@ -30,6 +30,17 @@ function ReplyCard({ reply, postId, currentUid }) {
   const [votes, setVotes]     = useState(reply.upvotes || 0)
   const [confirm, setConfirm] = useState(false)
   const { user } = useAuth()
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+  if (!user) return;
+  // Fetch the user's profile doc to check the flag
+  getDoc(doc(db, 'users', user.uid)).then(snap => {
+    if (snap.exists() && snap.data().isAdmin === true) {
+      setIsAdmin(true);
+    }
+  });
+}, [user]);
 
   useEffect(() => {
     if (!user) return
@@ -92,7 +103,7 @@ function ReplyCard({ reply, postId, currentUid }) {
             style={{ background: upvoted ? 'rgba(0,212,255,.1)' : 'none', border: `1px solid ${upvoted ? 'var(--cyan)' : 'var(--border2)'}`, color: upvoted ? 'var(--cyan)' : 'var(--text2)', borderRadius: 6, padding: '3px 10px', cursor: 'pointer', fontSize: '.78rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, transition: 'all .15s', fontFamily: 'var(--font-body)' }}>
             ▲ {votes}
           </button>
-          {isOwner && (
+          {(isAdmin ||isOwner) && (
             <div style={{ marginLeft: 'auto', display: 'flex', gap: 6, alignItems: 'center' }}>
               {confirm ? (
                 <>
@@ -125,7 +136,19 @@ export default function ForumPostPage() {
   const [replyBody, setReplyBody] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [confirmDel, setConfirmDel] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false);
   const textareaRef = useRef(null)
+
+
+  useEffect(() => {
+  if (!user) return;
+  // Fetch the user's profile doc to check the flag
+  getDoc(doc(db, 'users', user.uid)).then(snap => {
+    if (snap.exists() && snap.data().isAdmin === true) {
+      setIsAdmin(true);
+    }
+  });
+}, [user]);
 
   // Load post
   useEffect(() => {
@@ -264,12 +287,13 @@ export default function ForumPostPage() {
               ▲ {votes}
             </button>
 
-            {isOwner && (
+            {(isOwner || isAdmin) && (
               confirmDel
                 ? <><button className="btn btn-danger" style={{ padding: '5px 12px', fontSize: '.78rem' }} onClick={handleDeletePost}>Confirm Delete</button>
                    <button className="btn btn-ghost" style={{ padding: '5px 12px', fontSize: '.78rem' }} onClick={() => setConfirmDel(false)}>Cancel</button></>
                 : <button className="btn btn-ghost" style={{ padding: '5px 12px', fontSize: '.78rem', color: 'var(--red)' }} onClick={() => setConfirmDel(true)}>Delete Post</button>
             )}
+            
           </div>
         </div>
       </div>

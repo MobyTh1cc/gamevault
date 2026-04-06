@@ -52,6 +52,8 @@
   --red:        #ff4d6d;
   --red-dim:    #ff4d6d18;
   --gold:       #ffd700;
+  --purple: #a855f7; 
+  --purple-light: #e9d5ff;
 
   /* Geometry */
   --radius:    12px;

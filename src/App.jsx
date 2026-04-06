@@ -20,6 +20,7 @@ import FriendsPage     from './pages/FriendsPage'
 import ActivityPage    from './pages/ActivityPage'
 import ForumPage       from './pages/ForumPage'
 import ForumPostPage   from './pages/ForumPostPage'
+import BanGuard        from './components/BanGuard'
 
 export default function App() {
   const { user }  = useAuth()
@@ -62,29 +63,31 @@ export default function App() {
 
   return (
     <>
-    <FilterProvider>
-        {!hideNav && <Navbar libraryCount={library.length} />}
-        <Routes>
-          <Route path="/"                  element={<DiscoverPage {...sharedProps} />} />
-          <Route path="/game/:id"          element={<GameDetailPage {...sharedProps} />} />
-          <Route path="/library"           element={
-            <LibraryPage
-              library={library}
-              onRemoveFromLibrary={async (id) => { await removeFromLibrary(id); toast('Removed from library', 'info') }}
-              onUpdateRating={async (id, r) => { await updateRating(id, r); toast(`Rating updated to ${r}★`, 'success') }}
-            />
-          } />
-          <Route path="/foryou"            element={<ForYouPage library={library} subscriptions={subscriptions} />} />
-          <Route path="/suggest"           element={<SuggestPage />} />
-          <Route path="/profile/:uid"      element={<ProfilePage />} />
-          <Route path="/settings"          element={<SettingsPage />} />
-          <Route path="/forgot-password"   element={<ForgotPasswordPage />} />
-          <Route path="*"                  element={<NotFoundPage />} />
-          <Route path="/friends"        element={<FriendsPage />} />
-          <Route path="/activity"       element={<ActivityPage />} />
-          <Route path="/forum"          element={<ForumPage />} />
-          <Route path="/forum/:postId"  element={<ForumPostPage />} />
-        </Routes>
+      <FilterProvider>
+        <BanGuard>
+          {!hideNav && <Navbar libraryCount={library.length} />}
+          <Routes>
+            <Route path="/"                  element={<DiscoverPage {...sharedProps} />} />
+            <Route path="/game/:id"          element={<GameDetailPage {...sharedProps} />} />
+            <Route path="/library"           element={
+              <LibraryPage
+                library={library}
+                onRemoveFromLibrary={async (id) => { await removeFromLibrary(id); toast('Removed from library', 'info') }}
+                onUpdateRating={async (id, r) => { await updateRating(id, r); toast(`Rating updated to ${r}★`, 'success') }}
+              />
+            } />
+            <Route path="/foryou"            element={<ForYouPage library={library} subscriptions={subscriptions} />} />
+            <Route path="/suggest"           element={<SuggestPage />} />
+            <Route path="/profile/:uid"      element={<ProfilePage />} />
+            <Route path="/settings"          element={<SettingsPage />} />
+            <Route path="/forgot-password"   element={<ForgotPasswordPage />} />
+            <Route path="*"                  element={<NotFoundPage />} />
+            <Route path="/friends"        element={<FriendsPage />} />
+            <Route path="/activity"       element={<ActivityPage />} />
+            <Route path="/forum"          element={<ForumPage />} />
+            <Route path="/forum/:postId"  element={<ForumPostPage />} />
+          </Routes>
+        </BanGuard>
       </FilterProvider>
     </>
   )

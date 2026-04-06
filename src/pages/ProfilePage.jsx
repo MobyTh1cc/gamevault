@@ -7,6 +7,8 @@ import { useAuth } from '../lib/AuthContext'
 import { Avatar, Tag, RatingBadge, Spinner, Empty, StarRating } from '../components/ui'
 import { fmtDate, RATING_LABELS, scoreColor } from '../lib/constants'
 
+
+
 export default function ProfilePage() {
   const { uid }    = useParams()
   const { user, profile: myProfile } = useAuth()
@@ -18,6 +20,17 @@ export default function ProfilePage() {
   const [suggestions, setSuggestions] = useState([])
   const [loading, setLoading]   = useState(true)
   const [tab, setTab]           = useState('reviews')
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    // Fetch the user's profile doc to check the flag
+    getDoc(doc(db, 'users', user.uid)).then(snap => {
+      if (snap.exists() && snap.data().isAdmin === true) {
+        setIsAdmin(true);
+      }
+    });
+  }, [user]);
 
   useEffect(() => {
     if (!uid) return
@@ -46,6 +59,52 @@ export default function ProfilePage() {
     ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1)
     : null
 
+
+
+  const handleBanUser = async () => {
+    if (!window.confirm(`Ban ${profile.displayName} and DELETE all their content?`)) return;
+    
+    try {
+      const { updateDoc, doc, collection, query, where, getDocs, deleteDoc } = await import('firebase/firestore');
+
+      // 1. Ban the User
+      await updateDoc(doc(db, 'users', uid), { banned: true });
+
+      // 2. Wipe Reviews
+      const revs = await getDocs(query(collection(db, 'reviews'), where('uid', '==', uid)));
+      revs.forEach(d => deleteDoc(d.ref));
+
+      // 3. Wipe Suggestions
+      const sugs = await getDocs(query(collection(db, 'suggestions'), where('uid', '==', uid)));
+      sugs.forEach(d => deleteDoc(d.ref));
+
+      // 4. Update UI
+      setProfile(prev => ({ ...prev, banned: true }));
+      setReviews([]); // Clear local lists so they vanish from the page
+      setSuggestions([]);
+      
+      alert('User banned and content purged.');
+    } catch (err) {
+      console.error("Purge failed", err);
+    }
+  };
+
+  const handleUnbanUser = async () => {
+    if (!window.confirm(`Restore access for ${profile.displayName}?`)) return;
+    
+    try {
+      const { updateDoc, doc } = await import('firebase/firestore');
+      await updateDoc(doc(db, 'users', uid), { banned: false }); // Set to false
+      setProfile(prev => ({ ...prev, banned: false })); // Update UI immediately
+      alert('User has been unbanned.');
+    } catch (err) {
+      console.error("Unban failed", err);
+      alert('Failed to unban user.');
+    }
+  };
+
+
+
   return (
     <div className="page">
       {/* Profile header */}
@@ -60,6 +119,28 @@ export default function ProfilePage() {
               <button className="btn btn-ghost" style={{ padding: '6px 14px', fontSize: '.82rem' }} onClick={() => navigate('/settings')}>
                 ✏️ Edit Profile
               </button>
+            )}
+            {/* ADMIN BAN BUTTON */}
+            {isAdmin && (
+              <div style={{ display: 'flex', gap: 8 }}>
+                {profile.banned ? (
+                  <button 
+                    className="btn" 
+                    style={{ background: 'var(--purple)', color: '#fff', padding: '6px 14px', fontSize: '.82rem', border: 'none' }} 
+                    onClick={handleUnbanUser}
+                  >
+                    ✅ Unban User
+                  </button>
+                ) : (
+                  <button 
+                    className="btn" 
+                    style={{ background: 'var(--red)', color: '#fff', padding: '6px 14px', fontSize: '.82rem', border: 'none' }} 
+                    onClick={handleBanUser}
+                  >
+                    ⚠️ Ban User
+                  </button>
+                )}
+            </div>
             )}
           </div>
           {profile.bio && <p style={{ color: 'var(--text1)', lineHeight: 1.6, marginBottom: 10, maxWidth: 520 }}>{profile.bio}</p>}

@@ -13,6 +13,7 @@ import { Tag, Spinner, Empty, Modal } from '../components/ui'
 import { fmtDate, GENRES, PLATFORMS, TAGS_SPECIAL} from '../lib/constants'
 import { searchGames } from '../lib/api'
 
+
 /* ─── Game picker ──────────────────────────────────────────────────────────
    Defined at MODULE SCOPE — not inside another component — so its identity
    is stable. If defined inside a parent component body, React sees a new
@@ -354,6 +355,17 @@ function SuggestionCard({ suggestion, currentUid }) {
   const [votes, setVotes]     = useState(suggestion.votes || 0)
   const [voting, setVoting]   = useState(false)
   const [confirm, setConfirm] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    // Fetch the user's profile doc to check the flag
+    getDoc(doc(db, 'users', user.uid)).then(snap => {
+      if (snap.exists() && snap.data().isAdmin === true) {
+        setIsAdmin(true);
+      }
+    });
+  }, [user]);
 
   useEffect(() => {
     if (!user || !suggestion.id) return
@@ -485,7 +497,7 @@ function SuggestionCard({ suggestion, currentUid }) {
               }}
             >▲ {votes}</button>
 
-            {isOwner && (
+            {(isOwner || isAdmin) && (
               confirm
                 ? <>
                     <button className="btn btn-danger" style={{ padding: '4px 9px', fontSize: '.73rem' }} onClick={handleDelete}>Confirm</button>
@@ -493,6 +505,8 @@ function SuggestionCard({ suggestion, currentUid }) {
                   </>
                 : <button className="btn btn-ghost" style={{ padding: '4px 9px', fontSize: '.73rem', color: 'var(--red)' }} onClick={() => setConfirm(true)}>Delete</button>
             )}
+            
+            
           </div>
         </div>
       </div>
